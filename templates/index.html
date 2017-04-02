@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Facebook button example</title>
 
 </head>
 <body>
 <script>
     window.fbAsyncInit = function() {
       FB.init({
-        appId: "APP_ID",
+        appId: {{params['app_id']}},
         xfbml: true,
         version: "v2.6"
       });
@@ -24,8 +25,8 @@
   </script>
 <p>TEST</p>
 <div class="fb-messengermessageus"
-        messenger_app_id='MESSSENGER_ID'
-        page_id='PAGE_ID'
+        messenger_app_id={{params['app_id']}}
+        page_id={{params['page_id']}}
         color="blue"
         size="xlarge">
       </div>
