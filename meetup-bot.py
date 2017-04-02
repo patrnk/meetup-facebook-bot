@@ -11,7 +11,7 @@ app = flask.Flask(__name__)
 
 @app.route('/')
 def verify():
-    params = {'page_id': os.envrion['page_id'], 'app_id' : os.envrion['app_id']}
+    params = {'page_id': os.environ['page_id'], 'app_id' : os.environ['app_id']}
     if flask.request.args.get('hub.mode') != 'subscribe':
         return flask.render_template('index.html', **params)
     if not flask.request.args.get('hub.challenge'):
