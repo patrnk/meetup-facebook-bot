@@ -12,9 +12,9 @@ app = flask.Flask(__name__)
 @app.route('/')
 def verify():
     if flask.request.args.get('hub.mode') != 'subscribe':
-        return 'Access prohibited.', 403
+        return flask.render_template('index.html')
     if not flask.request.args.get('hub.challenge'):
-        return 'Access prohibited.', 403
+        return flask.render_template('index.html')
     if flask.request.args.get('hub.verify_token') != os.environ['VERIFY_TOKEN']:
         return 'Verification token mismatch', 403
     return flask.request.args['hub.challenge'], 200
