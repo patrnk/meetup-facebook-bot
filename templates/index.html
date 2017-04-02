@@ -10,7 +10,7 @@
 <script>
     window.fbAsyncInit = function() {
       FB.init({
-        appId: {{params['app_id']}},
+        appId: {{app_id}},
         xfbml: true,
         version: "v2.6"
       });
@@ -25,8 +25,8 @@
   </script>
 <p>TEST</p>
 <div class="fb-messengermessageus"
-        messenger_app_id={{params['app_id']}}
-        page_id={{params['page_id']}}
+        messenger_app_id={{app_id}}
+        page_id={{page_id}}
         color="blue"
         size="xlarge">
       </div>
