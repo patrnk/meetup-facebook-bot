@@ -51,7 +51,7 @@ def send_schedule(access_token, user_id, talks):
                 'buttons': [
                     {
                         'type': 'postback',
-                        'title': 'Описание',
+                        'title': 'Описание доклада',
                         'payload': 'info talk %d' % talk['id']
                     },
                     {
@@ -83,13 +83,16 @@ def send_schedule(access_token, user_id, talks):
 
 
 def send_more_talk_info(access_token, user_id, payload, talks):
-    talk_id = int(payload.split(' ')[-1])
+    talk_id = int(payload.split(' ')[-1]) - 1
+    title = talks[talk_id]['title']
+    description = talks[talk_id].get('description', 'Нет описания.')
+    more_info_text = '%s:\n%s' % (title, description)
     more_info = {
             'recipient': {
                 'id': user_id
                 },
             'message': {
-                'text': talks[talk_id - 1].get('description', 'Нет описания.')
+                'text': more_info_text
                 }
             }
     return send_message_to_facebook(access_token, more_info)
