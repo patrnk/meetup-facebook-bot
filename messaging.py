@@ -35,13 +35,19 @@ def send_main_menu(access_token, user_id):
     return send_message_to_facebook(access_token, main_menu)
 
 
+def form_talk_subtitle(talk):
+    speaker = talk.get('speaker', '')
+    description = talk.get('description', '')
+    return '%s: %s' % (speaker, description)
+
+
 def send_schedule(access_token, user_id, talks):
     elements = []
     for talk in talks:
         element = {
                 'title': talk['title'],
                 'image_url': talk.get('image_url'),
-                'subtitle': talk.get('speaker'),
+                'subtitle': form_talk_subtitle(talk),
                 'buttons': [
                     {
                         'type': 'postback',
