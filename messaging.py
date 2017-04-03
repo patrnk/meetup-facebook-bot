@@ -35,6 +35,48 @@ def send_main_menu(access_token, user_id):
     return send_message_to_facebook(access_token, main_menu)
 
 
+def form_talk_subtitle(talk):
+    speaker = talk.get('speaker', '')
+    description = talk.get('description', '')
+    return '%s: %s' % (speaker, description)
+
+
+def send_schedule(access_token, user_id, talks):
+    elements = []
+    for talk in talks:
+        element = {
+                'title': talk['title'],
+                'image_url': talk.get('image_url'),
+                'subtitle': form_talk_subtitle(talk),
+                'buttons': [
+                    {
+                        'type': 'postback',
+                        'title': 'Лайк',
+                        'payload': 'talk #%d' % talk['id']
+                    }
+                ]
+            }
+        elements.append(element)
+
+    schedule_message_body = {
+            'attachment': {
+                'type': 'template',
+                'payload': {
+                    'template_type': 'generic',
+                    'elements': elements
+                    }
+                }
+            }
+
+    schedule = {
+            'recipient': {
+                'id': user_id
+                },
+            'message': schedule_message_body
+            }
+    send_message_to_facebook(access_token, schedule)
+
+
 def send_message_to_facebook(access_token, message_data):
     headers = {
             'Content-Type': 'application/json',

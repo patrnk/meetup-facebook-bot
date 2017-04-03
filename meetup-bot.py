@@ -55,6 +55,8 @@ def webhook():
         sender_id = messaging_event['sender']['id']
         messaging.send_main_menu(access_token, sender_id)
     return 'Success.', 200
+
+
 messenger_profile.set_get_started_button(os.environ['ACCESS_TOKEN'], 'get started payload')
 
 
