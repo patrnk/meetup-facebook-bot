@@ -4,6 +4,9 @@ import requests
 
 
 def send_main_menu(access_token, user_id):
+    ''' Makes use of Quick Replies: 
+        https://developers.facebook.com/docs/messenger-platform/send-api-reference/quick-replies
+    '''
     main_menu_message_body = {
             'text': 'Чем могу помочь?',
             'quick_replies': [
@@ -42,6 +45,9 @@ def form_talk_subtitle(talk):
 
 
 def send_schedule(access_token, user_id, talks):
+    ''' Makes use of Generic Template: 
+        https://developers.facebook.com/docs/messenger-platform/send-api-reference/generic-template
+    '''
     elements = []
     for talk in talks:
         element = {
@@ -83,6 +89,9 @@ def send_schedule(access_token, user_id, talks):
 
 
 def send_more_talk_info(access_token, user_id, payload, talks):
+    ''' Send a simple Facebook message:
+        https://developers.facebook.com/docs/messenger-platform/send-api-reference/text-message
+    '''
     talk_id = int(payload.split(' ')[-1]) - 1
     title = talks[talk_id]['title']
     speaker = talks[talk_id]['speaker']
@@ -100,6 +109,9 @@ def send_more_talk_info(access_token, user_id, payload, talks):
 
 
 def send_like_confirmation(access_token, user_id, payload, talks):
+    ''' Send a simple Facebook message:
+        https://developers.facebook.com/docs/messenger-platform/send-api-reference/text-message
+    '''
     talk_id = int(payload.split(' ')[-1]) - 1
     title = talks[talk_id]['title']
     confirmation_text = 'Вы поставили лайк докладу "%s".' % title
