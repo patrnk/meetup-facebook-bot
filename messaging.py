@@ -51,8 +51,13 @@ def send_schedule(access_token, user_id, talks):
                 'buttons': [
                     {
                         'type': 'postback',
+                        'title': 'Описание',
+                        'payload': 'info talk #%d' % talk['id']
+                    },
+                    {
+                        'type': 'postback',
                         'title': 'Лайк',
-                        'payload': 'talk #%d' % talk['id']
+                        'payload': 'like talk #%d' % talk['id']
                     }
                 ]
             }
