@@ -2,6 +2,7 @@ import os
 
 import flask
 
+import messaging
 import messenger_profile
 
 
