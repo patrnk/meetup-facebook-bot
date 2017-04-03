@@ -82,6 +82,19 @@ def send_schedule(access_token, user_id, talks):
     send_message_to_facebook(access_token, schedule)
 
 
+def send_more_talk_info(access_token, user_id, payload, talks):
+    talk_id = int(payload.split(' ')[-1])
+    more_info = {
+            'recipient': {
+                'id': user_id
+                },
+            'message': {
+                'text': talks[talk_id].get('description', 'Нет описания.')
+                }
+            }
+    return send_message_to_facebook(access_token, more_info)
+
+
 def send_message_to_facebook(access_token, message_data):
     headers = {
             'Content-Type': 'application/json',

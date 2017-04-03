@@ -29,6 +29,12 @@ def is_schedule_button_pressed(messaging_event):
     return messaging_event['message']['quick_reply']['payload'] == 'schedule payload'
 
 
+def is_more_talk_info_button_pressed(messaging_event):
+    if 'postback' not in messaging_event:
+        return False
+    return 'info talk' in messaging_event['postback']['payload']
+
+
 def load_json_from_file(filename):
     with open(filename) as json_file:
         return json.load(json_file)
@@ -56,12 +62,15 @@ def webhook():
     if facebook_request['object'] != 'page':
         return 'Object is not a page', 400
 
+    talks = load_json_from_file('example_talks.json')
     messaging_events = extract_all_messaging_events(facebook_request['entry'])
     for messaging_event in messaging_events:
         sender_id = messaging_event['sender']['id']
         if is_schedule_button_pressed(messaging_event):
-            talks = load_json_from_file('example_talks.json')
             messaging.send_schedule(access_token, sender_id, talks)
+        if is_more_talk_info_button_pressed(messaging_event):
+            payload = messaging_event['postback']['payload']
+            messaging.send_more_talk_info(access_token, sender_id, payload, talks)
         messaging.send_main_menu(access_token, sender_id)
     return 'Success.', 200
 
