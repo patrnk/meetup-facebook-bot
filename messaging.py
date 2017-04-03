@@ -9,7 +9,7 @@ def send_main_menu(access_token, user_id):
             'quick_replies': [
                 {
                     'content_type': 'text',
-                    'title': 'Расписание',
+                    'title': 'Все доклады',
                     'payload': 'schedule payload'
                 },
                 {
