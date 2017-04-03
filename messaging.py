@@ -52,12 +52,12 @@ def send_schedule(access_token, user_id, talks):
                     {
                         'type': 'postback',
                         'title': 'Описание',
-                        'payload': 'info talk #%d' % talk['id']
+                        'payload': 'info talk %d' % talk['id']
                     },
                     {
                         'type': 'postback',
                         'title': 'Лайк',
-                        'payload': 'like talk #%d' % talk['id']
+                        'payload': 'like talk %d' % talk['id']
                     }
                 ]
             }
