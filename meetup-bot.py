@@ -2,7 +2,6 @@ import os
 
 import flask
 
-import hooks
 import messenger_profile
 
 
@@ -30,7 +29,8 @@ def webhook():
 
     messaging_events = extract_all_messaging_events(facebook_request['entry'])
     for messaging_event in messaging_events:
-        hooks.send_main_menu(access_token, messaging_event)
+        sender_id = messaging_event['sender']['id']
+        messaging.send_main_menu(access_token, sender_id)
     return 'Success.', 200
 
 
@@ -40,6 +40,20 @@ def extract_all_messaging_events(entries):
         for messaging_event in entry['messaging']:
             messaging_events.append(messaging_event)
     return messaging_events
+
+
+def is_quick_button_pressed(messaging_event):
+    if 'message' not in messaging_event:
+        return False;
+    if 'quick_reply' not in messaging_event['messaging']:
+        return False;
+    return True;
+
+
+def is_schedule_button_pressed(messaging_event):
+    if not is_quick_button_pressed(messaging_event):
+        return False
+    return messaging_event['payload'] == 'schedule payload'
 
 
 messenger_profile.set_get_started_button(os.environ['ACCESS_TOKEN'], 'get started payload')

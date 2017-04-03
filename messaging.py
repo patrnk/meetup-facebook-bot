@@ -3,7 +3,7 @@ import json
 import requests
 
 
-def send_main_menu_message(access_token, user_id):
+def send_main_menu(access_token, user_id):
     main_menu_message_body = {
             'text': 'Чем могу помочь?',
             'quick_replies': [
