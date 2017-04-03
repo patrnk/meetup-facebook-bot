@@ -27,10 +27,19 @@ def webhook():
     access_token = os.environ['ACCESS_TOKEN']
     if facebook_request['object'] != 'page':
         return 'Object is not a page', 400
-    for entry in facebook_request['entry']:
-        for messaging_event in entry['messaging']:
-            hooks.send_main_menu(access_token, messaging_event)
+
+    messaging_events = extract_all_messaging_events(facebook_request['entry'])
+    for messaging_event:
+        hooks.send_main_menu(access_token, messaging_event)
     return 'Success.', 200
+
+
+def extract_all_messaging_events(entries):
+    messaging_events = []
+    for entry in entries:
+        for messaging_event in entry['messaing']:
+            messaging_events.append(messaging_event)
+    return messaging_events
 
 
 messenger_profile.set_get_started_button(os.environ['ACCESS_TOKEN'], 'get started payload')
