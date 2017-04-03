@@ -85,8 +85,9 @@ def send_schedule(access_token, user_id, talks):
 def send_more_talk_info(access_token, user_id, payload, talks):
     talk_id = int(payload.split(' ')[-1]) - 1
     title = talks[talk_id]['title']
+    speaker = talks[talk_id]['speaker']
     description = talks[talk_id].get('description', 'Нет описания.')
-    more_info_text = '%s:\n%s' % (title, description)
+    more_info_text = '%s\n%s:%s' % (title, speaker, description)
     more_info = {
             'recipient': {
                 'id': user_id
