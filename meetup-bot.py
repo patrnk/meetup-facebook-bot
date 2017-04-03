@@ -1,4 +1,5 @@
 import os
+import json
 
 import flask
 
@@ -28,6 +29,11 @@ def is_schedule_button_pressed(messaging_event):
     return messaging_event['message']['quick_reply']['payload'] == 'schedule payload'
 
 
+def load_json_from_file(filename):
+    with open(filename) as json_file:
+        return json.load(json_file)
+
+
 app = flask.Flask(__name__)
 
 
@@ -54,7 +60,8 @@ def webhook():
     for messaging_event in messaging_events:
         sender_id = messaging_event['sender']['id']
         if is_schedule_button_pressed(messaging_event):
-            messaging.send_schedule(access_token, sender_id)
+            talks = load_json_from_file('example_talks.json')
+            messaging.send_schedule(access_token, sender_id, talks)
         messaging.send_main_menu(access_token, sender_id)
     return 'Success.', 200
 
