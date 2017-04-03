@@ -29,7 +29,7 @@ def webhook():
         return 'Object is not a page', 400
 
     messaging_events = extract_all_messaging_events(facebook_request['entry'])
-    for messaging_event:
+    for messaging_event in messaging_events:
         hooks.send_main_menu(access_token, messaging_event)
     return 'Success.', 200
 
