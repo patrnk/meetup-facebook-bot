@@ -89,7 +89,7 @@ def send_more_talk_info(access_token, user_id, payload, talks):
                 'id': user_id
                 },
             'message': {
-                'text': talks[talk_id].get('description', 'Нет описания.')
+                'text': talks[talk_id - 1].get('description', 'Нет описания.')
                 }
             }
     return send_message_to_facebook(access_token, more_info)
