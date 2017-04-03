@@ -87,7 +87,7 @@ def send_more_talk_info(access_token, user_id, payload, talks):
     title = talks[talk_id]['title']
     speaker = talks[talk_id]['speaker']
     description = talks[talk_id].get('description', 'Нет описания.')
-    more_info_text = '%s\n%s:\n%s' % (title, speaker, description)
+    more_info_text = '"%s"\n\n%s:\n%s' % (title, speaker, description)
     more_info = {
             'recipient': {
                 'id': user_id
@@ -102,7 +102,7 @@ def send_more_talk_info(access_token, user_id, payload, talks):
 def send_like_confirmation(access_token, user_id, payload, talks):
     talk_id = int(payload.split(' ')[-1]) - 1
     title = talks[talk_id]['title']
-    confirmation_text = 'Вы поставили лайк докладу \"%s\".' % title
+    confirmation_text = 'Вы поставили лайк докладу "%s".' % title
     confirmation = {
             'recipient': {
                 'id': user_id
