@@ -35,6 +35,12 @@ def is_more_talk_info_button_pressed(messaging_event):
     return 'info talk' in messaging_event['postback']['payload']
 
 
+def is_like_talk_button_pressed(messaging_event):
+    if 'postback' not in messaging_event:
+        return False
+    return 'like talk' in messaging_event['postback']['payload']
+
+
 def load_json_from_file(filename):
     with open(filename) as json_file:
         return json.load(json_file)
@@ -68,9 +74,14 @@ def webhook():
         sender_id = messaging_event['sender']['id']
         if is_schedule_button_pressed(messaging_event):
             messaging.send_schedule(access_token, sender_id, talks)
-        if is_more_talk_info_button_pressed(messaging_event):
+        elif is_more_talk_info_button_pressed(messaging_event):
             payload = messaging_event['postback']['payload']
             messaging.send_more_talk_info(access_token, sender_id, payload, talks)
+        elif is_like_talk_button_pressed(messaging_event):
+            payload = messaging_event['postback']['payload']
+            # TODO: actually set like
+            messaging.send_like_confirmation(access_token, sender_id, payload, talks)
+
         messaging.send_main_menu(access_token, sender_id)
     return 'Success.', 200
 

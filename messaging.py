@@ -99,6 +99,21 @@ def send_more_talk_info(access_token, user_id, payload, talks):
     return send_message_to_facebook(access_token, more_info)
 
 
+def send_like_confirmation(access_token, user_id, payload, talks):
+    talk_id = int(payload.split(' ')[-1]) - 1
+    title = talks[talk_id]['title']
+    confirmation_text = 'Вы поставили лайк докладу \"%s\".' % title
+    confirmation = {
+            'recipient': {
+                'id': user_id
+                },
+            'message': {
+                'text': confirmation_text
+                }
+            }
+    return send_message_to_facebook(access_token, confirmation)
+
+
 def send_message_to_facebook(access_token, message_data):
     headers = {
             'Content-Type': 'application/json',
