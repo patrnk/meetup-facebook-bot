@@ -25,7 +25,7 @@ def is_quick_button_pressed(messaging_event):
 def is_schedule_button_pressed(messaging_event):
     if not is_quick_button_pressed(messaging_event):
         return False
-    return messaging_event['payload'] == 'schedule payload'
+    return messaging_event['quick_reply']['payload'] == 'schedule payload'
 
 
 app = flask.Flask(__name__)
