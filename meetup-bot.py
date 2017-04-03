@@ -53,6 +53,8 @@ def webhook():
     messaging_events = extract_all_messaging_events(facebook_request['entry'])
     for messaging_event in messaging_events:
         sender_id = messaging_event['sender']['id']
+        if is_schedule_button_pressed(messaging_event):
+            messaging.send_schedule(access_token, sender_id)
         messaging.send_main_menu(access_token, sender_id)
     return 'Success.', 200
 
