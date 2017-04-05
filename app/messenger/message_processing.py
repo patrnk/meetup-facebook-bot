@@ -8,10 +8,10 @@ def extract_all_messaging_events(entries):
 
 def is_quick_button_pressed(messaging_event):
     if 'message' not in messaging_event:
-        return False;
+        return False
     if 'quick_reply' not in messaging_event['message']:
-        return False;
-    return True;
+        return False
+    return True
 
 
 def is_schedule_button_pressed(messaging_event):
