@@ -3,17 +3,15 @@ import json
 
 import flask
 
-import messaging
-import messenger_profile
-import message_processing
+from app import app
+from .messenger import messaging
+from .messenger import messenger_profile
+from .messenger import message_processing
 
 
 def load_json_from_file(filename):
     with open(filename) as json_file:
         return json.load(json_file)
-
-
-app = flask.Flask(__name__)
 
 
 @app.route('/')
