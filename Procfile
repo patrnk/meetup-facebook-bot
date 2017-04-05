@@ -1,1 +1,1 @@
-web: gunicorn meetup-bot:app
+web: gunicorn bot_server:app
