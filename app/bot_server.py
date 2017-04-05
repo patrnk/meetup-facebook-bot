@@ -33,7 +33,7 @@ def webhook():
     if facebook_request['object'] != 'page':
         return 'Object is not a page', 400
 
-    talks = load_json_from_file('example_talks.json')
+    talks = load_json_from_file('app/example_talks.json')
     messaging_events = message_processing.extract_all_messaging_events(facebook_request['entry'])
     for messaging_event in messaging_events:
         sender_id = messaging_event['sender']['id']
