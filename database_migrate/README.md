@@ -1,5 +1,5 @@
 #This is a database migration repository.#
-# Work with TMDB data #
+
 **More information at**
 
 [Short useful guide](http://jimmyhillis.com/using-sqlalchemy-migrate-for-managing-a-database/)
