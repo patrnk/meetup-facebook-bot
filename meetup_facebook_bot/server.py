@@ -1,14 +1,43 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from flask_admin.contrib.sqla import ModelView
+from flask_admin.form import SecureForm
+from flask_babelex import Babel
+from flask_admin import Admin
+
 
 from meetup_facebook_bot.messenger import message_validators, message_handlers
+from meetup_facebook_bot.models.speaker import Speaker
+from meetup_facebook_bot.models.talk import Talk
 
 app = Flask(__name__)
+babel = Babel(app)
 app.config.from_object('config')
 engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 Session = sessionmaker(bind=engine)
 db_session = Session()
+
+
+class TalkView(ModelView):
+    list_columns = ['id','speaker_facebook_id', 'speaker', 'title', 'description',  'likes']
+    form_base_class = SecureForm
+
+
+class SpeakerView(ModelView):
+    list_columns = ['facebook_id', 'name']
+    form_base_class = SecureForm
+
+admin = Admin(app, name='Facebook Meetup Bot', template_mode='bootstrap3')
+admin.add_view(TalkView(Talk, db_session))
+admin.add_view(SpeakerView(Speaker, db_session))
+
+
+@babel.localeselector
+def get_locale():
+    if request.args.get('lang'):
+        session['lang'] = request.args.get('lang')
+    return session.get('lang', 'en')
 
 
 def is_facebook_challenge_request(request):
