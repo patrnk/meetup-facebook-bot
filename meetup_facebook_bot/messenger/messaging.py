@@ -1,35 +1,47 @@
- # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import json
 
 import requests
 
 
-def send_main_menu(access_token, user_id):
+def send_rate_menu(access_token, user_id, talk, db_session):
     """ Makes use of Quick Replies:
         https://developers.facebook.com/docs/messenger-platform/send-api-reference/quick-replies
     """
-    main_menu_message_body = {
-        'text': 'Чем могу помочь?',
+    if talk.is_liked_by(user_id, db_session):
+        rate_button_title = 'Убрать лайк'
+    else:
+        rate_button_title = 'Поставить лайк'
+    rate_menu_message_body = {
+        'text': 'Как будем оценивать?',
         'quick_replies': [
             {
                 'content_type': 'text',
-                'title': 'Все доклады',
-                'payload': 'schedule payload'
+                'title': rate_button_title,
+                'payload': 'like talk %d' % talk.id
             },
             {
                 'content_type': 'text',
-                'title': 'Вопрос докладчику',
-                'payload': 'question payload'
-            },
-            {
-                'content_type': 'text',
-                'title': 'Чат',
-                'payload': 'chat payload'
+                'title': 'Отменить',
+                'payload': 'cancel payload'
             }
         ]
     }
-    return send_message_to_facebook(access_token, user_id, main_menu_message_body)
+    return send_message_to_facebook(access_token, user_id, rate_menu_message_body)
+
+
+def send_like_confirmation(access_token, user_id, talk, db_session):
+    if talk.is_liked_by(user_id, db_session):
+        like_text_message = 'Поставил лайк'
+    else:
+        like_text_message = 'Убрал лайк'
+    like_message_body = {
+        "message": {
+            "text": like_text_message
+        }
+    }
+    return send_message_to_facebook(access_token, user_id, like_message_body)
 
 
 def send_schedule(access_token, user_id, talks, db_session):
@@ -40,10 +52,7 @@ def send_schedule(access_token, user_id, talks, db_session):
     for talk in talks:
         number_of_likes = talk.count_likes(db_session)
         element_subtitle = 'Лайков: %d\nСпикер: %s' % (number_of_likes, talk.speaker.name)
-        if talk.is_liked_by(user_id, db_session):
-            like_button_title = 'Убрать лайк'
-        else:
-            like_button_title = 'Поставить лайк'
+        rate_button_title = 'Оценить'
         element = {
             'title': talk.title,
             'subtitle': element_subtitle,
@@ -55,8 +64,13 @@ def send_schedule(access_token, user_id, talks, db_session):
                 },
                 {
                     'type': 'postback',
-                    'title': like_button_title,
-                    'payload': 'like talk %d' % talk.id
+                    'title': rate_button_title,
+                    'payload': 'rate talk %d' % talk.id
+                },
+                {
+                    'type': 'postback',
+                    'title': 'Задать вопрос',
+                    'payload': 'ask talk %d' % talk.id
                 }
             ]
         }
