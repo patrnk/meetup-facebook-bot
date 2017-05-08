@@ -26,6 +26,7 @@ db_session = Session()
 
 
 banned = {}
+admin_params = {'ACCESS': False}
 
 class TalkView(ModelView):
     list_columns = ['id','speaker_facebook_id', 'speaker', 'title', 'description',  'likes']
