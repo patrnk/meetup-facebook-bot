@@ -33,10 +33,10 @@ class TalkView(ModelView):
     form_base_class = SecureForm
 
     def is_accessible(self):
-        if session['logged']:
-            return True
-        else:
+        if session.get('logged') is None or session.get('logged') is not True:
             return False
+        else:
+            return True
 
 
 class SpeakerView(ModelView):
@@ -44,11 +44,10 @@ class SpeakerView(ModelView):
     form_base_class = SecureForm
 
     def is_accessible(self):
-        if session['logged']:
-            return True
-        else:
+        if session.get('logged') is None or session.get('logged') is not True:
             return False
-
+        else:
+            return True
 
 admin = Admin(app, name='Facebook Meetup Bot', template_mode='bootstrap3')
 admin.add_view(TalkView(Talk, db_session))
