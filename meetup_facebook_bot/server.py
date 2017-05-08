@@ -41,6 +41,7 @@ admin = Admin(app, name='Facebook Meetup Bot', template_mode='bootstrap3')
 admin.add_view(TalkView(Talk, db_session))
 admin.add_view(SpeakerView(Speaker, db_session))
 
+
 class LoginForm(Form):
     login = StringField('Login', [validators.DataRequired()])
     passkey = PasswordField('Passkey', [validators.DataRequired()])
@@ -104,19 +105,18 @@ def login():
     if form.validate_on_submit():
         flash('Successfully logged in')
         session['user_id'] = form.login.data
-        return redirect(url_for('index'))
+        return redirect('admin')
     return render_template('login.html', form=form)
 
 
 @app.route('/')
 def verify():
     params = {'PAGE_ID': app.config['PAGE_ID'], 'APP_ID': app.config['APP_ID']}
-    if not is_facebook_challenge_request(request) and session['user_id'] is not None:
+    if not is_facebook_challenge_request(request):
         return render_template('index.html', **params)
     if request.args.get('hub.verify_token') != app.config['VERIFY_TOKEN']:
         return 'Verification token mismatch', 403
-    if not is_facebook_challenge_request(request) and session['user_id'] is None:
-        return redirect(url_for('login'))
+
     return request.args['hub.challenge'], 200
 
 
