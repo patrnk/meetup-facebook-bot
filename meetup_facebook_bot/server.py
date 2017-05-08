@@ -91,6 +91,7 @@ class LoginForm(Form):
                 banned[user_ip]['time'] = datetime.datetime.today()
             return False
 
+        banned.pop(user_ip)
         return True
 
 
