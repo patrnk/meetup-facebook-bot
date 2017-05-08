@@ -13,9 +13,7 @@
 [code-climate]: https://codeclimate.com/github/Stark-Mountain/meetup-facebook-bot?branch=master
 [license-badge]: https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square
 [license]: https://opensource.org/licenses/MIT?branch=master
-    
-    
-[<img src="https://github.com/fbsamples/messenger-bot-samples/blob/master/docs/assets/ViewMessenger.png" width="200">](https://m.me/cryptictor11398)
+
 
 FIXME: write the description
 
