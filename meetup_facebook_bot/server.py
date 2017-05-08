@@ -69,7 +69,7 @@ class LoginForm(Form):
         user_ip = request.remote_addr
 
         if user_ip in banned.keys():
-            if banned[user_ip]['count'] >= 3 and datetime.datetime.today == banned[user_ip]['date']:
+            if banned[user_ip]['count'] >= 3 and datetime.datetime.today == banned[user_ip]['time']:
                 return False
 
         if self.login.data != os.environ['login']:
