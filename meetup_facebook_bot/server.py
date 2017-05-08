@@ -100,7 +100,7 @@ def login():
     print(form.validate())
     if form.validate():
         flash('Successfully logged in')
-        admin_params = {'CURRENT_LOGIN': form.login.data, 'TRUE_LOGIN': os.environ['login']}
+        admin_params = {'ACCESS': True}
         return redirect(url_for('admin.index',**admin_params))
     return render_template('login.html', form=form)
 
