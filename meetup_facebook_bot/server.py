@@ -102,6 +102,7 @@ def is_facebook_challenge_request(request):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
+    print(form.validate())
     if form.validate():
         flash('Successfully logged in')
         session['user_id'] = form.login.data
