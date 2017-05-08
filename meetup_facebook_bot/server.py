@@ -101,7 +101,7 @@ def login():
     if form.validate():
         flash('Successfully logged in')
         session['user_id'] = form.login.data
-        return redirect(url_for('admin'))
+        return redirect(url_for('admin.index'))
     return render_template('login.html', form=form)
 
 
