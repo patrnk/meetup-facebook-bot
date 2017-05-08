@@ -34,7 +34,7 @@ class TalkView(ModelView):
     form_base_class = SecureForm
 
     def is_accessible(self):
-        if logged[request.remote_addr] is not None:
+        if request.remote_addr not in logged.keys():
             return logged[request.remote_addr]
         else:
             return False
@@ -45,7 +45,7 @@ class SpeakerView(ModelView):
     form_base_class = SecureForm
 
     def is_accessible(self):
-        if logged[request.remote_addr] is not None:
+        if request.remote_addr not in logged.keys():
             return logged[request.remote_addr]
         else:
             return False
