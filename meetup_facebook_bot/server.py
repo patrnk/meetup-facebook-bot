@@ -115,8 +115,7 @@ def login():
     print(form.validate())
     if form.validate():
         flash('Successfully logged in')
-        admin_params = {'ACCESS': True}
-        return redirect(url_for('admin.index',**admin_params))
+        return redirect(url_for('admin.index'))
     return render_template('login.html', form=form)
 
 
