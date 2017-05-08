@@ -26,7 +26,6 @@ db_session = Session()
 
 
 banned = {}
-logged = {}
 
 
 class TalkView(ModelView):
@@ -34,7 +33,7 @@ class TalkView(ModelView):
     form_base_class = SecureForm
 
     def is_accessible(self):
-        if request.headers['X-Forwarded-For'].split(',')[0] in logged.keys():
+        if session['logged']:
             return True
         else:
             return False
@@ -45,7 +44,7 @@ class SpeakerView(ModelView):
     form_base_class = SecureForm
 
     def is_accessible(self):
-        if request.headers['X-Forwarded-For'].split(',')[0] in logged.keys():
+        if session['logged']:
             return True
         else:
             return False
@@ -112,7 +111,7 @@ def login():
     form = LoginForm()
     user_ip = request.headers['X-Forwarded-For'].split(',')[0]
     if form.validate(user_ip):
-        logged[user_ip] = True
+        session['logged'] = True
         flash('Successfully logged in')
         return redirect(url_for('admin.index'))
     return render_template('login.html', form=form)
