@@ -49,6 +49,7 @@ class SpeakerView(ModelView):
         else:
             return True
 
+
 admin = Admin(app, name='Facebook Meetup Bot', template_mode='bootstrap3')
 admin.add_view(TalkView(Talk, db_session))
 admin.add_view(SpeakerView(Speaker, db_session))
@@ -62,12 +63,15 @@ class LoginForm(Form):
         Form.__init__(self, *args, **kwargs)
         self.user = None
 
-    def validate(self, user_ip):
-        flag = False
-
+    def check_ip_for_bruteforce(self, user_ip):
         if user_ip in banned.keys():
             if banned[user_ip]['count'] >= 3 and datetime.datetime.today == banned[user_ip]['time']:
-                return False
+                return True
+
+        return False
+
+    def validate(self, user_ip):
+        flag = False
 
         if self.login.data != os.environ['login']:
             if user_ip not in banned.keys():
@@ -109,10 +113,11 @@ def is_facebook_challenge_request(request):
 def login():
     form = LoginForm()
     user_ip = request.headers['X-Forwarded-For'].split(',')[0]
-    if form.validate(user_ip):
-        session['logged'] = True
-        flash('Successfully logged in')
-        return redirect(url_for('admin.index'))
+    if not form.check_ip_for_bruteforce(user_ip):
+        if form.validate(user_ip):
+            session['logged'] = True
+            flash('Successfully logged in')
+            return redirect(url_for('admin.index'))
     return render_template('login.html', form=form)
 
 
