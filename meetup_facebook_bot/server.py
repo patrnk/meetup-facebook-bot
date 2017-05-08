@@ -111,6 +111,7 @@ def is_facebook_challenge_request(request):
 def login():
     form = LoginForm()
     user_ip = request.headers['X-Forwarded-For'].split(',')[0]
+    print(user_ip)
     if form.validate(user_ip):
         logged[user_ip] = True
         flash('Successfully logged in')
