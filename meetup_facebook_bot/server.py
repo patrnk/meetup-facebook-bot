@@ -90,7 +90,7 @@ class LoginForm(Form):
                 banned[user_ip]['time'] = datetime.datetime.today()
             return False
 
-        logged[user_ip] = True
+
         return True
 
 
@@ -114,6 +114,7 @@ def login():
     form = LoginForm()
     print(form.validate())
     if form.validate():
+        logged[request.remote_addr] = True
         flash('Successfully logged in')
         return redirect(url_for('admin.index'))
     return render_template('login.html', form=form)
