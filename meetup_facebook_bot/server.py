@@ -1,15 +1,15 @@
+import os
+import datetime
 from flask import Flask, request, render_template, session, flash, url_for, redirect
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.form import SecureForm
-from flask_babelex import Babel
 from flask_admin import Admin
+from flask_babelex import Babel
 from flask_wtf import Form
 from wtforms.fields import StringField, PasswordField
 from wtforms import validators
-import os
-import datetime
 
 
 from meetup_facebook_bot.messenger import message_validators, message_handlers
@@ -28,8 +28,15 @@ db_session = Session()
 banned = {}
 
 
+def check_ip_for_bruteforce(user_ip):
+    if user_ip in banned.keys():
+        if banned[user_ip]['count'] > 2 and datetime.datetime.today == banned[user_ip]['time']:
+            return True
+    return False
+
+
 class TalkView(ModelView):
-    list_columns = ['id','speaker_facebook_id', 'speaker', 'title', 'description',  'likes']
+    list_columns = ['id', 'speaker_facebook_id', 'speaker', 'title', 'description', 'likes']
     form_base_class = SecureForm
 
     def is_accessible(self):
@@ -63,19 +70,12 @@ class LoginForm(Form):
         Form.__init__(self, *args, **kwargs)
         self.user = None
 
-    def check_ip_for_bruteforce(self, user_ip):
-        if user_ip in banned.keys():
-            if banned[user_ip]['count'] >= 3 and datetime.datetime.today == banned[user_ip]['time']:
-                return True
-
-        return False
-
     def validate(self, user_ip):
         flag = False
 
         if self.login.data != os.environ['login']:
             if user_ip not in banned.keys():
-                banned[user_ip] = {'count': 1,'time': datetime.datetime.today()}
+                banned[user_ip] = {'count': 1, 'time': datetime.datetime.today()}
                 flag = True
             else:
                 banned[user_ip]['count'] += 1
@@ -84,9 +84,9 @@ class LoginForm(Form):
             return False
 
         if self.passkey.data != os.environ['passkey']:
-            if user_ip not in banned.keys() and flag == False:
+            if user_ip not in banned.keys() and not flag:
                 banned[user_ip] = {'count': 1, 'time': datetime.datetime.today()}
-            elif flag == False:
+            elif not flag:
                 banned[user_ip]['count'] += 1
                 banned[user_ip]['time'] = datetime.datetime.today()
             return False
@@ -113,7 +113,7 @@ def is_facebook_challenge_request(request):
 def login():
     form = LoginForm()
     user_ip = request.headers['X-Forwarded-For'].split(',')[0]
-    if not form.check_ip_for_bruteforce(user_ip):
+    if not check_ip_for_bruteforce(user_ip):
         if form.validate(user_ip):
             session['logged'] = True
             flash('Successfully logged in')
