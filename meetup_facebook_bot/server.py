@@ -66,7 +66,7 @@ class LoginForm(Form):
 
     def validate(self):
         flag = False
-        user_ip = request.headers['X-Forwarded-For'].split[','][0]
+        user_ip = request.headers()['X-Forwarded-For'].split[','][0]
 
         if user_ip in banned.keys():
             if banned[user_ip]['count'] >= 3 and datetime.datetime.today == banned[user_ip]['time']:
