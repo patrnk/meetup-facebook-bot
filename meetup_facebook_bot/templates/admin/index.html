@@ -4,7 +4,7 @@
 <div class="row-fluid">
 
     <div>
-        {% if current_user.is_authenticated %}
+        {% if session['user_id'] is not None %}
         <h1>Flask-Admin example</h1>
         <p class="lead">
             Authentication
@@ -17,6 +17,4 @@
         <a class="btn btn-primary" href="/login"><i class="icon-arrow-left icon-white"></i> Back</a>
          {% endif %}
     </div>
-
-    
 </div>        
