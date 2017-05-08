@@ -64,7 +64,7 @@ class LoginForm(Form):
         Form.__init__(self, *args, **kwargs)
         self.user = None
 
-    def validate1(self, user_ip):
+    def validate(self, user_ip):
         flag = False
 
         if user_ip in banned.keys():
