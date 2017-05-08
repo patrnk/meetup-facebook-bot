@@ -51,9 +51,6 @@ class LoginForm(Form):
         self.user = None
 
     def validate(self):
-        rv = Form.validate(self)
-        if not rv:
-            return False
         flag = False
         user_ip = request.remote_addr
 
