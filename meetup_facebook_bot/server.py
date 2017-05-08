@@ -63,8 +63,8 @@ admin.add_view(SpeakerView(Speaker, db_session))
 
 
 class LoginForm(Form):
-    login = StringField('Login', [validators.DataRequired()])
-    passkey = PasswordField('Passkey', [validators.DataRequired()])
+    login = StringField('Login', [validators.DataRequired(), validators.length(-1, 35)])
+    passkey = PasswordField('Passkey', [validators.DataRequired(), validators.length(-1, 35)])
 
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)
