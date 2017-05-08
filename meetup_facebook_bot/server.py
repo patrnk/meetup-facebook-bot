@@ -59,7 +59,7 @@ class LoginForm(Form):
                 return False
 
         if self.login.data != os.environ['login']:
-            self.username.errors.append('Unknown username')
+            self.login.errors.append('Unknown username')
             if  user_ip not in banned.keys():
                 banned[user_ip] = {'count': 1,'time': datetime.datetime.today()}
                 flag = True
@@ -70,7 +70,7 @@ class LoginForm(Form):
             return False
 
         if self.passkey.data != os.environ['passkey']:
-            self.password.errors.append('Invalid password')
+            self.passkey.errors.append('Invalid password')
             if user_ip not in banned.keys() and flag == False:
                 banned[user_ip] = {'count': 1, 'time': datetime.datetime.today()}
             elif flag == False:
