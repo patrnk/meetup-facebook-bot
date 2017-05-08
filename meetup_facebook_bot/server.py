@@ -66,14 +66,14 @@ class LoginForm(Form):
 
     def validate(self):
         flag = False
-        user_ip = request.remote_addr
+        user_ip = request.headers['X-Forwarded-For'].split[','][0]
 
         if user_ip in banned.keys():
             if banned[user_ip]['count'] >= 3 and datetime.datetime.today == banned[user_ip]['time']:
                 return False
 
         if self.login.data != os.environ['login']:
-            if  user_ip not in banned.keys():
+            if user_ip not in banned.keys():
                 banned[user_ip] = {'count': 1,'time': datetime.datetime.today()}
                 flag = True
             else:
@@ -89,7 +89,6 @@ class LoginForm(Form):
                 banned[user_ip]['count'] += 1
                 banned[user_ip]['time'] = datetime.datetime.today()
             return False
-
 
         return True
 
@@ -113,8 +112,9 @@ def is_facebook_challenge_request(request):
 def login():
     form = LoginForm()
     print(form.validate())
+    user_ip = request.headers['X-Forwarded-For'].split[','][0]
     if form.validate():
-        logged[request.remote_addr] = True
+        logged[user_ip] = True
         flash('Successfully logged in')
         return redirect(url_for('admin.index'))
     return render_template('login.html', form=form)
