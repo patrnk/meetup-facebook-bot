@@ -34,7 +34,7 @@ class TalkView(ModelView):
     form_base_class = SecureForm
 
     def is_accessible(self):
-        if request.remote_addr in logged.keys():
+        if request.headers['X-Forwarded-For'].split(',')[0] in logged.keys():
             return True
         else:
             return False
@@ -45,7 +45,7 @@ class SpeakerView(ModelView):
     form_base_class = SecureForm
 
     def is_accessible(self):
-        if request.remote_addr in logged.keys():
+        if request.headers['X-Forwarded-For'].split(',')[0] in logged.keys():
             return True
         else:
             return False
@@ -111,7 +111,6 @@ def is_facebook_challenge_request(request):
 def login():
     form = LoginForm()
     user_ip = request.headers['X-Forwarded-For'].split(',')[0]
-    print(user_ip)
     if form.validate(user_ip):
         logged[user_ip] = True
         flash('Successfully logged in')
