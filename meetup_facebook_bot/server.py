@@ -26,16 +26,29 @@ db_session = Session()
 
 
 banned = {}
-admin_params = {'ACCESS': False}
+logged = {}
+
 
 class TalkView(ModelView):
     list_columns = ['id','speaker_facebook_id', 'speaker', 'title', 'description',  'likes']
     form_base_class = SecureForm
 
+    def is_accessible(self):
+        if logged[request.remote_addr] is not None:
+            return logged[request.remote_addr]
+        else:
+            return False
+
 
 class SpeakerView(ModelView):
     list_columns = ['facebook_id', 'name']
     form_base_class = SecureForm
+
+    def is_accessible(self):
+        if logged[request.remote_addr] is not None:
+            return logged[request.remote_addr]
+        else:
+            return False
 
 
 admin = Admin(app, name='Facebook Meetup Bot', template_mode='bootstrap3')
@@ -77,6 +90,7 @@ class LoginForm(Form):
                 banned[user_ip]['time'] = datetime.datetime.today()
             return False
 
+        logged[user_ip] = True
         return True
 
 
