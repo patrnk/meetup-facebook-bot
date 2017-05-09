@@ -1,14 +1,104 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, session, flash, url_for, redirect
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from flask_admin.contrib.sqla import ModelView
+from flask_admin.form import SecureForm
+from flask_babelex import Babel
+from flask_admin import Admin
+from flask_wtf import Form
+from wtforms.fields import StringField, PasswordField
+from wtforms import validators
+import os
+import datetime
+
 
 from meetup_facebook_bot.messenger import message_validators, message_handlers
+from meetup_facebook_bot.models.speaker import Speaker
+from meetup_facebook_bot.models.talk import Talk
+
 
 app = Flask(__name__)
+babel = Babel(app)
 app.config.from_object('config')
 engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 Session = sessionmaker(bind=engine)
 db_session = Session()
+
+
+banned = {}
+
+
+class TalkView(ModelView):
+    list_columns = ['id','speaker_facebook_id', 'speaker', 'title', 'description',  'likes']
+    form_base_class = SecureForm
+
+    def is_accessible(self):
+        if session.get('logged') is None or session.get('logged') is not True:
+            return False
+        else:
+            return True
+
+
+class SpeakerView(ModelView):
+    list_columns = ['facebook_id', 'name']
+    form_base_class = SecureForm
+
+    def is_accessible(self):
+        if session.get('logged') is None or session.get('logged') is not True:
+            return False
+        else:
+            return True
+
+
+admin = Admin(app, name='Facebook Meetup Bot', template_mode='bootstrap3')
+admin.add_view(TalkView(Talk, db_session))
+admin.add_view(SpeakerView(Speaker, db_session))
+
+
+class LoginForm(Form):
+    login = StringField('Login', [validators.DataRequired()])
+    passkey = PasswordField('Passkey', [validators.DataRequired()])
+
+    def __init__(self, *args, **kwargs):
+        Form.__init__(self, *args, **kwargs)
+        self.user = None
+
+    def check_ip_for_bruteforce(self, user_ip):
+        if user_ip in banned.keys():
+            if banned[user_ip]['count'] >= 3 and datetime.datetime.today == banned[user_ip]['time']:
+                return True
+
+        return False
+
+    def validate(self, user_ip):
+        flag = False
+
+        if self.login.data != os.environ['login']:
+            if user_ip not in banned.keys():
+                banned[user_ip] = {'count': 1,'time': datetime.datetime.today()}
+                flag = True
+            else:
+                banned[user_ip]['count'] += 1
+                banned[user_ip]['time'] = datetime.datetime.today()
+                flag = True
+            return False
+
+        if self.passkey.data != os.environ['passkey']:
+            if user_ip not in banned.keys() and flag == False:
+                banned[user_ip] = {'count': 1, 'time': datetime.datetime.today()}
+            elif flag == False:
+                banned[user_ip]['count'] += 1
+                banned[user_ip]['time'] = datetime.datetime.today()
+            return False
+
+        return True
+
+
+@babel.localeselector
+def get_locale():
+    if request.args.get('lang'):
+        session['lang'] = request.args.get('lang')
+    return session.get('lang', 'en')
 
 
 def is_facebook_challenge_request(request):
@@ -19,6 +109,18 @@ def is_facebook_challenge_request(request):
     return True
 
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    user_ip = request.headers['X-Forwarded-For'].split(',')[0]
+    if not form.check_ip_for_bruteforce(user_ip):
+        if form.validate(user_ip):
+            session['logged'] = True
+            flash('Successfully logged in')
+            return redirect(url_for('admin.index'))
+    return render_template('login.html', form=form)
+
+
 @app.route('/')
 def verify():
     params = {'PAGE_ID': app.config['PAGE_ID'], 'APP_ID': app.config['APP_ID']}
@@ -26,6 +128,7 @@ def verify():
         return render_template('index.html', **params)
     if request.args.get('hub.verify_token') != app.config['VERIFY_TOKEN']:
         return 'Verification token mismatch', 403
+
     return request.args['hub.challenge'], 200
 
 
