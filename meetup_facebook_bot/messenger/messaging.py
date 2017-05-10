@@ -5,31 +5,59 @@ import json
 import requests
 
 
-def send_main_menu(access_token, user_id):
+def send_rate_menu(access_token, user_id, talk, db_session):
     """ Makes use of Quick Replies:
         https://developers.facebook.com/docs/messenger-platform/send-api-reference/quick-replies
     """
-    main_menu_message_body = {
-        'text': 'Чем могу помочь?',
+    if talk.is_liked_by(user_id, db_session):
+        rate_button_title = 'Убрать лайк'
+    else:
+        rate_button_title = 'Поставить лайк'
+    talk_title = talk.title
+    rate_menu_message_body = {
+        'text': 'Как оценишь доклад? \n %s' % talk_title,
         'quick_replies': [
             {
                 'content_type': 'text',
-                'title': 'Все доклады',
-                'payload': 'schedule payload'
+                'title': rate_button_title,
+                'payload': 'like talk %d' % talk.id
             },
             {
                 'content_type': 'text',
-                'title': 'Вопрос докладчику',
-                'payload': 'question payload'
-            },
-            {
-                'content_type': 'text',
-                'title': 'Чат',
-                'payload': 'chat payload'
+                'title': 'Отменить',
+                'payload': 'cancel payload'
             }
         ]
     }
-    return send_message_to_facebook(access_token, user_id, main_menu_message_body)
+    return send_message_to_facebook(access_token, user_id, rate_menu_message_body)
+
+
+def send_like_confirmation(access_token, user_id, talk, db_session):
+    talk_title = talk.title
+    if talk.is_liked_by(user_id, db_session):
+        like_text_message = 'Поставил лайк докладу:\n %s' % talk_title
+    else:
+        like_text_message = 'Убрал лайк c доклада:\n %s' % talk_title
+    like_message_body = {
+        "text": like_text_message
+    }
+    return send_message_to_facebook(access_token, user_id, like_message_body)
+
+
+def generate_ask_question_button(ask_question_url):
+    if ask_question_url is None:
+        ask_question_button = {
+            'type': 'postback',
+            'title': 'Задать вопрос',
+            'payload': 'ask question no url'
+        }
+    else:
+        ask_question_button = {
+            'type': 'web_url',
+            'url': ask_question_url,
+            'title': 'Задать вопрос',
+        }
+    return ask_question_button
 
 
 def send_schedule(access_token, user_id, talks, db_session):
@@ -39,11 +67,16 @@ def send_schedule(access_token, user_id, talks, db_session):
     elements = []
     for talk in talks:
         number_of_likes = talk.count_likes(db_session)
-        element_subtitle = 'Лайков: %d\nСпикер: %s' % (number_of_likes, talk.speaker.name)
         if talk.is_liked_by(user_id, db_session):
-            like_button_title = 'Убрать лайк'
+            like_text = 'Вы лайкнули этот доклад'
         else:
-            like_button_title = 'Поставить лайк'
+            like_text = 'Вы не оценили этот докад'
+        element_subtitle = '{like_text}\nЛайков: {number_of_likes}\nСпикер: {name}'.format(
+            like_text=like_text,
+            number_of_likes=number_of_likes,
+            name=talk.speaker.name
+        )
+        ask_question_button = generate_ask_question_button(talk.ask_question_url)
         element = {
             'title': talk.title,
             'subtitle': element_subtitle,
@@ -55,9 +88,10 @@ def send_schedule(access_token, user_id, talks, db_session):
                 },
                 {
                     'type': 'postback',
-                    'title': like_button_title,
-                    'payload': 'like talk %d' % talk.id
-                }
+                    'title': 'Оценить',
+                    'payload': 'rate talk %d' % talk.id
+                },
+                ask_question_button
             ]
         }
         elements.append(element)
@@ -86,6 +120,36 @@ def send_talk_info(access_token, user_id, talk):
         'text': more_info_text
     }
     return send_message_to_facebook(access_token, user_id, more_info)
+
+
+def send_duplicate_authentication_error(access_token, user_id):
+    """ Send a simple Facebook message:
+        https://developers.facebook.com/docs/messenger-platform/send-api-reference/text-message
+    """
+    error_message_body = {
+        'text': 'Докладчик уже авторизован, повторно не получится.'
+    }
+    return send_message_to_facebook(access_token, user_id, error_message_body)
+
+
+def send_authentication_confirmation(access_token, user_id, speaker_name):
+    """ Send a simple Facebook message:
+        https://developers.facebook.com/docs/messenger-platform/send-api-reference/text-message
+    """
+    confirmation_message_body = {
+        'text': 'Вы зарегистрировались как докладчик %s.' % speaker_name
+    }
+    return send_message_to_facebook(access_token, user_id, confirmation_message_body)
+
+
+def send_no_ask_question_url_warning(access_token, sender_id):
+    """ Send a simple Facebook message:
+        https://developers.facebook.com/docs/messenger-platform/send-api-reference/text-message
+    """
+    warning_message_body = {
+        'text': 'Я не знаю, куда отправлять вопрос.'
+    }
+    return send_message_to_facebook(access_token, sender_id, warning_message_body)
 
 
 def send_message_to_facebook(access_token, user_id, message_data):
