@@ -37,7 +37,7 @@ class LoginForm(Form):
         Form.__init__(self, *args, **kwargs)
         self.user = None
 
-    def validate(self, user_ip):
+    def validate(self):
         if self.login.data != os.environ['login'] or self.passkey.data != os.environ['passkey']:
             time.sleep(random.random(0,30))
             return False
@@ -64,7 +64,7 @@ def is_facebook_challenge_request(request):
 def login():
     form = LoginForm()
     user_ip = request.headers['X-Forwarded-For'].split(',')[0]
-    if form.validate(user_ip):
+    if form.validate:
         session['logged'] = True
         flash('Successfully logged in')
         return redirect(url_for('admin.index'))
