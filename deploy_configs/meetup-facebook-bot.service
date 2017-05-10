@@ -1,0 +1,13 @@
+[Unit]
+Description=uWSGI instance to serve meetup_facebook_bot
+After=network.target
+
+[Service]
+User={user}
+Group=www-data
+WorkingDirectory={work_dir}
+Environment="PATH={env_bin_dir}"
+ExecStart={uwsgi_path} --ini {app_ini_path}
+
+[Install]
+WantedBy=multi-user.target
