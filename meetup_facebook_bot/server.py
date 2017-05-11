@@ -38,10 +38,9 @@ class LoginForm(Form):
         self.user = None
 
     def validate(self):
-        if self.login.data != os.environ['login'] or self.passkey.data != os.environ['passkey']:
+        if self.login.data != app.config['LOGIN'] or self.passkey.data != app.config['PASSKEY']:
             time.sleep(random.random(0,30))
             return False
-
         return True
 
 
