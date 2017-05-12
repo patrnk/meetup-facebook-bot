@@ -5,6 +5,7 @@ import vcr
 
 from meetup_facebook_bot.messenger import messaging
 
+
 class MessagingTestCase(TestCase):
 	def create_mockup_talk(self):
 		talk_mock = MagicMock(id=1, title=1, speaker_facebook_id=1)
