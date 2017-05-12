@@ -7,6 +7,11 @@ from meetup_facebook_bot.messenger import messaging
 
 
 class MessagingTestCase(TestCase):
+    def create_mockup_talk(self):
+        talk_mock = MagicMock(id=1, title=1, speaker_facebook_id=1)
+        talk_mock.is_liked_by = MagicMock(return_value=False)
+        return talk_mock
+
     def generate_mockup_talks(self):
         talk_mocks = []
         for talk_id in range(1, 6):
@@ -49,3 +54,14 @@ class MessagingTestCase(TestCase):
         self.assertTrue('recipient_id' in response)
         self.assertTrue('message_id' in response)
         self.assertEqual(response['recipient_id'], self.user_id)
+
+    def test_send_rate_menu(self):
+        talk = self.create_mockup_talk()
+        db_session = MagicMock()
+        with vcr.use_cassette('vcr_cassettes/send_rate_menu.yaml'):
+            response = messaging.send_rate_menu(self.access_token, self.user_id, talk, db_session)
+        self.assertTrue('recipient_id' in response)
+        self.assertTrue('message_id' in response)
+        self.assertEqual(response['recipient_id'], self.user_id)
+
+
