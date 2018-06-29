@@ -1,4 +1,4 @@
-# meetup-facebook-bot
+# Meetup Facebook Bot
 
 [![Build Status][build-badge]][build]
 [![Coverage Status][coverage-badge]][coverage]
